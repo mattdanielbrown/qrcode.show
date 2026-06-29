@@ -1,9 +1,6 @@
 use csscolorparser::Color;
-use image::EncodableLayout;
-use image::ImageEncoder;
+use image::ImageFormat;
 use image::Rgba;
-use image::codecs::jpeg::JpegEncoder;
-use image::codecs::png::PngEncoder;
 use qrcode::EcLevel;
 use qrcode::QrCode;
 use qrcode::QrResult;
@@ -11,6 +8,7 @@ use qrcode::Version;
 use qrcode::render::svg;
 use qrcode::render::unicode;
 use qrcode::types::QrError;
+use std::io::Cursor;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Format {
@@ -20,6 +18,19 @@ pub enum Format {
     PlainText,
     Png,
     Jpeg,
+    Gif,
+    WebP,
+    Pnm,
+    Tiff,
+    Tga,
+    Dds,
+    Bmp,
+    Ico,
+    Hdr,
+    OpenExr,
+    Farbfeld,
+    Avif,
+    Qoi,
 }
 
 impl Default for Format {
@@ -35,8 +46,47 @@ impl From<&str> for Format {
             "image/svg+xml" => Self::Svg,
             "text/plain" => Self::PlainText,
             "image/png" => Self::Png,
-            "image/jpeg" => Self::Jpeg,
+            "image/jpeg" | "image/jpg" => Self::Jpeg,
+            "image/gif" => Self::Gif,
+            "image/webp" => Self::WebP,
+            "image/x-portable-anymap" => Self::Pnm,
+            "image/tiff" => Self::Tiff,
+            "image/x-tga" => Self::Tga,
+            // "image/vnd.ms-dds" => Self::Dds,
+            "image/bmp" => Self::Bmp,
+            // "image/vnd.microsoft.icon" => Self::Ico,
+            // "image/vnd.radiance" => Self::Hdr,
+            // "image/x-exr" => Self::OpenExr,
+            // "image/farbfeld" => Self::Farbfeld,
+            // "image/avif" => Self::Avif,
+            "image/qoi" => Self::Qoi,
             _ => Self::default(),
+        }
+    }
+}
+
+impl Format {
+    pub fn content_type(&self) -> &'static str {
+        match self {
+            Self::Svg => "image/svg+xml",
+            Self::Html => "text/html",
+            Self::PlainText => "text/plain",
+            Self::Unicode => "text/plain",
+            Self::Png => "image/png",
+            Self::Jpeg => "image/jpeg",
+            Self::Gif => "image/gif",
+            Self::WebP => "image/webp",
+            Self::Pnm => "image/x-portable-anymap",
+            Self::Tiff => "image/tiff",
+            Self::Tga => "image/x-tga",
+            Self::Dds => "image/vnd.ms-dds",
+            Self::Bmp => "image/bmp",
+            Self::Ico => "image/vnd.microsoft.icon",
+            Self::Hdr => "image/vnd.radiance",
+            Self::OpenExr => "image/x-exr",
+            Self::Farbfeld => "image/farbfeld",
+            Self::Avif => "image/avif",
+            Self::Qoi => "image/qoi",
         }
     }
 }
@@ -44,6 +94,29 @@ impl From<&str> for Format {
 impl From<&String> for Format {
     fn from(headerval: &String) -> Self {
         headerval.as_str().into()
+    }
+}
+
+impl From<Format> for ImageFormat {
+    fn from(format: Format) -> Self {
+        match format {
+            Format::Png => Self::Png,
+            Format::Jpeg => Self::Jpeg,
+            Format::Gif => Self::Gif,
+            Format::WebP => Self::WebP,
+            Format::Pnm => Self::Pnm,
+            Format::Tiff => Self::Tiff,
+            Format::Tga => Self::Tga,
+            Format::Dds => Self::Dds,
+            Format::Bmp => Self::Bmp,
+            Format::Ico => Self::Ico,
+            Format::Hdr => Self::Hdr,
+            Format::OpenExr => Self::OpenExr,
+            Format::Farbfeld => Self::Farbfeld,
+            Format::Avif => Self::Avif,
+            Format::Qoi => Self::Qoi,
+            _ => Self::Png, // Default to PNG for unsupported formats
+        }
     }
 }
 
@@ -168,87 +241,6 @@ impl Generator {
                 bytes
             }
 
-            Format::Png => {
-                let [dr, dg, db, da] = self
-                    .dark_color
-                    .as_deref()
-                    .unwrap_or("#000")
-                    .parse::<Color>()
-                    .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
-                    .to_linear_rgba_u8();
-
-                let [lr, lg, lb, la] = self
-                    .light_color
-                    .as_deref()
-                    .unwrap_or("#fff")
-                    .parse::<Color>()
-                    .unwrap_or(Color::from_rgba8(255, 255, 255, 0))
-                    .to_linear_rgba_u8();
-
-                let image = code
-                    .render::<Rgba<u8>>()
-                    .dark_color(Rgba([dr, dg, db, da]))
-                    .light_color(Rgba([lr, lg, lb, la]))
-                    .min_dimensions(min_width, min_height)
-                    .max_dimensions(max_width, max_height)
-                    .quiet_zone(self.quiet_zone.unwrap_or(true))
-                    .build();
-
-                let bytes = image.as_bytes();
-                let mut result: Vec<u8> = Default::default();
-                let encoder = PngEncoder::new(&mut result);
-                encoder
-                    .write_image(
-                        bytes,
-                        image.width(),
-                        image.height(),
-                        image::ExtendedColorType::Rgba8,
-                    )
-                    .map_err(|_| QrError::UnsupportedCharacterSet)?;
-                println!("aaa");
-                result
-            }
-
-            Format::Jpeg => {
-                let [dr, dg, db, da] = self
-                    .dark_color
-                    .as_deref()
-                    .unwrap_or("#000")
-                    .parse::<Color>()
-                    .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
-                    .to_linear_rgba_u8();
-
-                let [lr, lg, lb, la] = self
-                    .light_color
-                    .as_deref()
-                    .unwrap_or("#fff")
-                    .parse::<Color>()
-                    .unwrap_or(Color::from_rgba8(255, 255, 255, 0))
-                    .to_linear_rgba_u8();
-
-                let image = code
-                    .render::<Rgba<u8>>()
-                    .dark_color(Rgba([dr, dg, db, da]))
-                    .light_color(Rgba([lr, lg, lb, la]))
-                    .min_dimensions(min_width, min_height)
-                    .max_dimensions(max_width, max_height)
-                    .quiet_zone(self.quiet_zone.unwrap_or(true))
-                    .build();
-
-                let bytes = image.as_bytes();
-                let mut result: Vec<u8> = Default::default();
-                let mut encoder = JpegEncoder::new(&mut result);
-                encoder
-                    .encode(
-                        bytes,
-                        image.width(),
-                        image.height(),
-                        image::ExtendedColorType::Rgba8,
-                    )
-                    .map_err(|_| QrError::UnsupportedCharacterSet)?;
-                result
-            }
-
             Format::PlainText => {
                 let mut bytes = code
                     .render::<char>()
@@ -272,6 +264,55 @@ impl Generator {
                     .into_bytes();
                 bytes.push(b'\n');
                 bytes
+            }
+
+            Format::Png
+            | Format::Jpeg
+            | Format::Gif
+            | Format::WebP
+            | Format::Pnm
+            | Format::Tiff
+            | Format::Tga
+            | Format::Dds
+            | Format::Bmp
+            | Format::Ico
+            | Format::Hdr
+            | Format::OpenExr
+            | Format::Farbfeld
+            | Format::Avif
+            | Format::Qoi => {
+                let [dr, dg, db, da] = self
+                    .dark_color
+                    .as_deref()
+                    .unwrap_or("#000")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
+                    .to_linear_rgba_u8();
+
+                let [lr, lg, lb, la] = self
+                    .light_color
+                    .as_deref()
+                    .unwrap_or("#fff")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(255, 255, 255, 0))
+                    .to_linear_rgba_u8();
+
+                let image = code
+                    .render::<Rgba<u8>>()
+                    .dark_color(Rgba([dr, dg, db, da]))
+                    .light_color(Rgba([lr, lg, lb, la]))
+                    .min_dimensions(min_width, min_height)
+                    .max_dimensions(max_width, max_height)
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
+                    .build();
+
+                let mut result = vec![];
+
+                image
+                    .write_to(&mut Cursor::new(&mut result), self.format.into())
+                    .map_err(|_| QrError::UnsupportedCharacterSet)?;
+
+                result
             }
         };
 

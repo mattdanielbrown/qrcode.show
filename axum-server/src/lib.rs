@@ -6,8 +6,6 @@ use axum::{
     http::StatusCode,
     http::header,
     http::header::HeaderName,
-    http::header::HeaderValue,
-    response::IntoResponse,
     response::Response,
     routing::get,
 };
@@ -153,146 +151,43 @@ where
     }
 }
 
-enum QRResponse {
-    Cors,
-    Plain(String),
-    Html(String),
-    Svg(String),
-    Png(Vec<u8>),
-    Jpeg(Vec<u8>),
-    Unicode(Vec<u8>),
-}
-
-fn cors(mut res: Response) -> Response {
-    res.headers_mut().insert(
-        header::ACCESS_CONTROL_ALLOW_METHODS,
-        HeaderValue::from_static("HEAD, POST, GET, OPTIONS"),
-    );
-
-    res.headers_mut().insert(
-        header::ACCESS_CONTROL_ALLOW_ORIGIN,
-        HeaderValue::from_static("*"),
-    );
-
-    res.headers_mut().insert(
-        header::ACCESS_CONTROL_ALLOW_HEADERS,
-        HeaderValue::from_static("*"),
-    );
-    res
-}
-
-impl IntoResponse for QRResponse {
-    fn into_response(self) -> Response {
-        let resp = match self {
-            Self::Cors => Response::new(Body::empty()),
-
-            Self::Plain(text) => {
-                let mut res = Response::new(Body::from(text));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("text/plain"),
-                );
-
-                res
-            }
-
-            Self::Svg(svg) => {
-                let mut res = Response::new(Body::from(svg));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("image/svg+xml"),
-                );
-
-                res
-            }
-
-            Self::Html(html) => {
-                let mut res = Response::new(Body::from(html));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("text/html"),
-                );
-
-                res
-            }
-
-            Self::Unicode(data) => {
-                let mut res = Response::new(Body::from(data));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    header::HeaderValue::from_static(
-                        "application/octet-stream",
-                    ),
-                );
-
-                res
-            }
-
-            Self::Png(png) => {
-                let mut res = Response::new(Body::from(png));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("image/png"),
-                );
-
-                res
-            }
-
-            Self::Jpeg(jpeg) => {
-                let mut res = Response::new(Body::from(jpeg));
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("image/jpeg"),
-                );
-
-                res
-            }
-        };
-        cors(resp)
-    }
-}
-
 fn generate(
     bytes: &[u8],
     generator: &Generator,
-) -> Result<QRResponse, StatusCode> {
+) -> Result<Response, StatusCode> {
     let image = generator
         .generate(bytes)
         .map_err(|_| StatusCode::BAD_REQUEST)?;
 
-    match generator.format {
-        Format::Svg => {
-            Ok(QRResponse::Svg(String::from_utf8_lossy(&image).to_string()))
-        }
+    let body = Body::from(image);
 
-        Format::Png => Ok(QRResponse::Png(image)),
-
-        Format::Jpeg => Ok(QRResponse::Jpeg(image)),
-
-        Format::Html => {
-            let html = TEMPLATE
-                .replace("{{ content }}", &String::from_utf8_lossy(&image))
-                .replace("{{ help }}", &HTML_HELP);
-            Ok(QRResponse::Html(html))
-        }
-
-        Format::Unicode => Ok(QRResponse::Unicode(image)),
-
-        Format::PlainText => Ok(QRResponse::Plain(
-            String::from_utf8_lossy(&image).to_string(),
-        )),
-    }
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, generator.format.content_type())
+        .body(body)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-async fn options_handler() -> Result<QRResponse, StatusCode> {
-    Ok(QRResponse::Cors)
+async fn options_handler() -> Result<Response, StatusCode> {
+    let resp = Response::builder()
+        .status(StatusCode::OK)
+        .header(
+            header::ACCESS_CONTROL_ALLOW_METHODS,
+            "HEAD, POST, GET, OPTIONS",
+        )
+        .header(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+        .header(header::ACCESS_CONTROL_ALLOW_HEADERS, "*")
+        .body(Body::empty())
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok(resp)
 }
 
 async fn post_handler(
     OriginalUri(uri): OriginalUri,
     QRGenerator(generator): QRGenerator,
     bytes: Bytes,
-) -> Result<QRResponse, StatusCode> {
+) -> Result<Response, StatusCode> {
     let (_, path) = uri.path().split_once('/').unwrap_or_default();
     if !path.is_empty() {
         return Err(StatusCode::BAD_REQUEST);
@@ -308,23 +203,28 @@ async fn post_handler(
 async fn get_handler(
     OriginalUri(uri): OriginalUri,
     QRGenerator(generator): QRGenerator,
-) -> Result<QRResponse, StatusCode> {
+) -> Result<Response, StatusCode> {
     let (_, path) = uri.path().split_once('/').unwrap_or_default();
 
     if path.is_empty() {
         match generator.format {
             Format::Html => {
                 let html = TEMPLATE
+                    .trim()
                     .replace("{{ content }}", "")
-                    .replace("{{ help }}", &HTML_HELP);
-                Ok(QRResponse::Html(html))
+                    .replace("{{ help }}", &HTML_HELP.trim());
+                Ok(Response::builder()
+                    .status(StatusCode::OK)
+                    .header(header::CONTENT_TYPE, "text/html; charset=utf-8")
+                    .body(Body::from(html))
+                    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
             }
-            Format::PlainText | Format::Unicode => {
-                Ok(QRResponse::Plain(HELP.to_string()))
-            }
-            Format::Jpeg | Format::Png | Format::Svg => {
-                Err(StatusCode::BAD_REQUEST)
-            }
+            Format::PlainText | Format::Unicode => Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, "text/plain; charset=utf-8")
+                .body(Body::from(HELP.trim()))
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?),
+            _ => Err(StatusCode::BAD_REQUEST),
         }
     } else {
         let input = uri

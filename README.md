@@ -1,7 +1,7 @@
 ### NAME
 
-**QRcode.show - Generate QR code easily for free - QR Code Generation as
-a Service**
+**QRcode.show** - Generate QR code easily for free - QR Code Generation as
+a Service
 
 ### USAGE
 
@@ -41,59 +41,21 @@ echo https://example.com | curl qrcode.show -d @-
 
 ### PARAMETERS
 
-**Accept**
-
-Specify the output type.
-Options: `application/octet-stream` (default) / `text/plain` / `text/html` / `image/svg+xml` / `image/png` / `image/jpeg`
-
-**X-QR-Width**
-
-Specify the default width.
-
-**X-QR-Height**
-
-Specify the default height.
-
-**X-QR-Min-Width**
-
-Specify the minimum width.
-
-**X-QR-Min-Height**
-
-Specify the minimum height.
-
-**X-QR-Max-Width**
-
-Specify the maximum width.
-
-**X-QR-Max-Height**
-
-Specify the maximum height.
-
-**X-QR-Dark-Color**
-
-Specify the dark color (hex). Format: rrggbb
-
-**X-QR-Light-Color**
-
-Specify the light color (hex). Format: rrggbb
-
-**X-QR-Version-Type**
-
-Specify the QR version type. Options: normal / micro
-
-**X-QR-Version-Number**
-
-Specify the QR version number. Options: `1` -> `40` for normal, `1` -> `4` for
-micro.
-
-**X-QR-EC-Level**
-
-Specify the error checking level. Options: `L` (default) / `M` / `Q` / `H`
-
-**X-QR-Quiet-Zone**
-
-Specify whether the quiet zone is added. Options: `true` (default) / `false`
+| Header              | Description          | Format / Options                                                                                  |
+| ------------------- | -------------------- | ------------------------------------------------------------------------------------------------- |
+| Accept              | output type          | `application/octet-stream`, `text/plain`, `text/html`, `image/svg+xml`, `image/png`, `image/jpeg` |
+| X-QR-Width          | default width        |
+| X-QR-Height         | default height       |
+| X-QR-Min-Width      | minimum width        |
+| X-QR-Min-Height     | minimum height       |
+| X-QR-Max-Width      | maximum width        |
+| X-QR-Max-Height     | maximum height       |
+| X-QR-Dark-Color     | dark color (hex)     | rrggbb                                                                                            |
+| X-QR-Light-Color    | light color (hex)    | rrggbb                                                                                            |
+| X-QR-Version-Type   | QR version type      | `normal`, `micro`                                                                                 |
+| X-QR-Version-Number | QR version number    | `1` -> `40` for normal, `1` -> `4` for micro.                                                     |
+| X-QR-EC-Level       | error checking level | `L`, `M`, `Q`, `H`                                                                                |
+| X-QR-Quiet-Zone     | add quiet zone       | `true`/ `false`                                                                                   |
 
 ### PARAMETER EXAMPLES
 
@@ -106,7 +68,7 @@ curl qrcode.show/INPUT -H "Accept: image/svg+xml"
 Shell functions that can be added to `.bashrc` or `.bash_profle` for
 quickly generating QR codes from the command line. The command takes the
 argument as input or reads from stdin if none was supplied and outputs
-the QR code to stdout. e.g. `qrcode INPUT` or `echo INPUT | qrcode`
+the QR code to stdout.
 
 ```bash
 qrcode () {

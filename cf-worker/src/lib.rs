@@ -13,7 +13,7 @@ async fn fetch(
     utils::set_panic_hook();
 
     let mut router = axum_server::router();
-    let response = router.call(req).await.unwrap();
+    let response = router.call(req).await?;
 
     Ok(response)
 }
