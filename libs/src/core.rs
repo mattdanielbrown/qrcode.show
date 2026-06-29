@@ -1,16 +1,16 @@
 use csscolorparser::Color;
+use image::EncodableLayout;
+use image::ImageEncoder;
+use image::Rgba;
 use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::PngEncoder;
-use image::ColorType;
-use image::EncodableLayout;
-use image::Rgba;
-use qrcode::render::svg;
-use qrcode::render::unicode;
-use qrcode::types::QrError;
 use qrcode::EcLevel;
 use qrcode::QrCode;
 use qrcode::QrResult;
 use qrcode::Version;
+use qrcode::render::svg;
+use qrcode::render::unicode;
+use qrcode::types::QrError;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Format {
@@ -169,7 +169,7 @@ impl Generator {
             }
 
             Format::Png => {
-                let (dr, dg, db, da) = self
+                let [dr, dg, db, da] = self
                     .dark_color
                     .as_deref()
                     .unwrap_or("#000")
@@ -177,7 +177,7 @@ impl Generator {
                     .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
                     .to_linear_rgba_u8();
 
-                let (lr, lg, lb, la) = self
+                let [lr, lg, lb, la] = self
                     .light_color
                     .as_deref()
                     .unwrap_or("#fff")
@@ -198,11 +198,11 @@ impl Generator {
                 let mut result: Vec<u8> = Default::default();
                 let encoder = PngEncoder::new(&mut result);
                 encoder
-                    .encode(
+                    .write_image(
                         bytes,
                         image.width(),
                         image.height(),
-                        ColorType::Rgba8,
+                        image::ExtendedColorType::Rgba8,
                     )
                     .map_err(|_| QrError::UnsupportedCharacterSet)?;
                 println!("aaa");
@@ -210,7 +210,7 @@ impl Generator {
             }
 
             Format::Jpeg => {
-                let (dr, dg, db, da) = self
+                let [dr, dg, db, da] = self
                     .dark_color
                     .as_deref()
                     .unwrap_or("#000")
@@ -218,7 +218,7 @@ impl Generator {
                     .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
                     .to_linear_rgba_u8();
 
-                let (lr, lg, lb, la) = self
+                let [lr, lg, lb, la] = self
                     .light_color
                     .as_deref()
                     .unwrap_or("#fff")
@@ -243,7 +243,7 @@ impl Generator {
                         bytes,
                         image.width(),
                         image.height(),
-                        ColorType::Rgba8,
+                        image::ExtendedColorType::Rgba8,
                     )
                     .map_err(|_| QrError::UnsupportedCharacterSet)?;
                 result

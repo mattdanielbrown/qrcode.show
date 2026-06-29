@@ -127,7 +127,7 @@
     <meta name="theme-color" content="#ffffff" />
 
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+      @import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
 
       @media print {
         #help *,
@@ -143,7 +143,7 @@
       button {
         max-width: 840px;
         margin: auto;
-        font-family: 'Share Tech Mono', monospace;
+        font-family: "Share Tech Mono", monospace;
         font-size: x-large;
         line-height: 1.5;
         height: auto;
@@ -239,13 +239,13 @@
 
     <script>
       $(document).ready(function () {
-        $('#print').on('click', function (event) {
+        $("#print").on("click", function (event) {
           window.print();
         });
 
-        let demos = ['demo.mp4', 'lets-be-nice.mp4'];
+        let demos = ["demo.mp4", "lets-be-nice.mp4"];
         let randvideo = demos[Math.ceil(Math.random() * 10) % demos.length];
-        $('#demo').html(`
+        $("#demo").html(`
           <video controls>
             <source
               src="https://cdn.qrcode.show/__res__/${randvideo}"
@@ -254,40 +254,40 @@
           </video>
         `);
 
-        $('#submit').on('click', function (event) {
+        $("#submit").on("click", function (event) {
           event.preventDefault();
 
-          $('#qr').html(
+          $("#qr").html(
             '<img src="https://via.placeholder.com/360/fff/000/?text=Loading..." height="360" width="360" />'
           );
-          $('#qrcontrols').hide();
+          $("#qrcontrols").hide();
 
-          let data = $('#data').val();
+          let data = $("#data").val();
 
           $.ajax({
-            type: 'POST',
-            url: '/',
+            type: "POST",
+            url: "/",
             headers: {
-              'Content-Type': 'text/plain;charset=UTF-8',
-              Accept: 'image/svg+xml',
+              "Content-Type": "text/plain;charset=UTF-8",
+              Accept: "image/svg+xml",
             },
             data: data,
             success: function (resp) {
-              $('#qr').html(resp);
-              $('#qrcontrols').show();
+              $("#qr").html(resp);
+              $("#qrcontrols").show();
             },
             error: function () {
-              $('#qr').html(
+              $("#qr").html(
                 '<img src="https://via.placeholder.com/360/fff/f00/?text=ERROR! Try again..." height="360" width="360" />'
               );
-              $('#qrcontrols').hide();
+              $("#qrcontrols").hide();
             },
-            dataType: 'html',
+            dataType: "html",
           });
         });
 
-        if ($('#qr').html() !== '') {
-          $('#qrcontrols').show();
+        if ($("#qr").html() !== "") {
+          $("#qrcontrols").show();
         }
       });
     </script>

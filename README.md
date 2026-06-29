@@ -1,10 +1,9 @@
-<h1 align = "center">QRcode.show </h1>
+### NAME
 
-<h2 align = "center">Generate QR code easily for free - QR Code Generation as a Service.</h2>
+**QRcode.show - Generate QR code easily for free - QR Code Generation as
+a Service**
 
-<br>
-
-### INPUT:
+### USAGE
 
 ```bash
 curl qrcode.show/INPUT
@@ -22,7 +21,7 @@ curl qrcode.show -d @/PATH/TO/INPUT
 echo INPUT | curl qrcode.show -d @-
 ```
 
-### INPUT EXAMPLES:
+### USAGE EXAMPLES
 
 ```bash
 curl qrcode.show/https://example.com
@@ -40,137 +39,116 @@ curl qrcode.show -d @/path/to/input.txt
 echo https://example.com | curl qrcode.show -d @-
 ```
 
-### PARAMETERS:
+### PARAMETERS
 
-```
-    Accept                      Specify the output type
-                                Options:
-                                    application/octet-stream
-                                    text/plain
-                                    text/html
-                                    image/svg+xml
-                                    image/png
-                                    image/jpeg
-                                Default: application/octet-stream
+**Accept**
 
-    X-QR-Width                  Specify the default width
+Specify the output type.
+Options: `application/octet-stream` (default) / `text/plain` / `text/html` / `image/svg+xml` / `image/png` / `image/jpeg`
 
-    X-QR-Height                 Specify the default height
+**X-QR-Width**
 
-    X-QR-Min-Width              Specify the minimum width
+Specify the default width.
 
-    X-QR-Min-Height             Specify the minimun height
+**X-QR-Height**
 
-    X-QR-Max-Width              Specify the maximum width
+Specify the default height.
 
-    X-QR-Max-Height             Specify the maximum height
+**X-QR-Min-Width**
 
-    X-QR-Dark-Color             Specify the dark color (hex)
-                                Format: rrggbb
+Specify the minimum width.
 
-    X-QR-Light-Color            Specify the light color (hex)
-                                Format: rrggbb
+**X-QR-Min-Height**
 
-    X-QR-Version-Type           Specify the QR version type
-                                Options:
-                                    normal
-                                    micro
-                                Default: auto detect
+Specify the minimum height.
 
-    X-QR-Version-Number         Specify the QR version number
-                                Options:
-                                    1..40 for normal
-                                    1..4 for micro
-                                Default: auto detect
+**X-QR-Max-Width**
 
-    X-QR-EC-Level               Specify the error checking level
-                                Options:
-                                    L
-                                    M
-                                    Q
-                                    H
-                                Default: L
+Specify the maximum width.
 
-    X-QR-Quiet-Zone             Specify whether the quiet zone is added
-                                Options:
-                                    true
-                                    false
-                                Default: true
-```
+**X-QR-Max-Height**
 
-### PARAMETER EXAMPLES:
+Specify the maximum height.
+
+**X-QR-Dark-Color**
+
+Specify the dark color (hex). Format: rrggbb
+
+**X-QR-Light-Color**
+
+Specify the light color (hex). Format: rrggbb
+
+**X-QR-Version-Type**
+
+Specify the QR version type. Options: normal / micro
+
+**X-QR-Version-Number**
+
+Specify the QR version number. Options: `1` -> `40` for normal, `1` -> `4` for
+micro.
+
+**X-QR-EC-Level**
+
+Specify the error checking level. Options: `L` (default) / `M` / `Q` / `H`
+
+**X-QR-Quiet-Zone**
+
+Specify whether the quiet zone is added. Options: `true` (default) / `false`
+
+### PARAMETER EXAMPLES
 
 ```bash
 curl qrcode.show/INPUT -H "Accept: image/svg+xml"
 ```
 
-### SHELL FUNCTIONS:
+### SHELL FUNCTIONS
 
-Shell functions that can be added to `.bashrc` or `.bash_profle` for quickly generating QR codes from the command line. The command takes the argument as input or reads from stdin if none was supplied and outputs the QR code to stdout: `qrcode INPUT` or `echo INPUT | qrcode`
+Shell functions that can be added to `.bashrc` or `.bash_profle` for
+quickly generating QR codes from the command line. The command takes the
+argument as input or reads from stdin if none was supplied and outputs
+the QR code to stdout. e.g. `qrcode INPUT` or `echo INPUT | qrcode`
 
 ```bash
 qrcode () {
-  local input="$*"
-  [ -z "$input" ] && local input="@/dev/stdin"
-  curl -d "$input" https://qrcode.show
+    local input="$*"
+    [ -z "$input" ] && local input="@/dev/stdin"
+    curl -d "$input" https://qrcode.show
 }
-```
-
-```bash
 qrsvg () {
-  local input="$*"
-  [ -z "$input" ] && local input="@/dev/stdin"
-  curl -d "${input}" https://qrcode.show -H "Accept: image/svg+xml"
+    local input="$*"
+    [ -z "$input" ] && local input="@/dev/stdin"
+    curl -d "${input}" https://qrcode.show -H "Accept: image/svg+xml"
 }
-```
-
-```bash
 qrserve () {
-  local port=${1:-8080}
-  local dir=${2:-.}
-  local ip="$(ifconfig | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt IP:)" \
+    local port=${1:-8080}
+    local dir=${2:-.}
+    local ip="$(ifconfig | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt IP:)" \
     && echo http://$ip:$port | qrcode \
     && python -m http.server $port -b $ip -d $dir
 }
 ```
 
-### PROGRAMMING LANGUANGE EXAMPLES
+### FEATURES
 
-- [Node.js](./examples/nodejs)
+- No data collection or retention.
+- Fast and simple API that works on both web and terminal.
+- Supports GET and POST requests.
+- Supports `Accept` header to control the output format.
 
-### 🚀 FEATURES :
+### CREDITS
 
-- No data collection or retention
-- Fast and simple API that works on both web and terminal
-- Supports GET and POST requests
-- Supports `Accept` header to control the output format
+- **Main Library**: <https://github.com/kennytm/qrcode-rust>
+- **Cloudflare Worker** : <https://github.com/cloudflare/workers-rs>
+- **Alternate Web Server**: <https://github.com/tokio-rs/axum>
 
-### 📝 TODO:
+NOTE: Only the direct dependencies for the core logic are listed here Please
+contact the project maintainer if you are missing from the list.
 
-- Support more parameters
-- Get a logo
-- Support dynamic QR codes
-- Generate premium/branded QR codes
+### RELATED LINKS
 
-### 💖 SPONSORS:
+- **Project Repository**: <https://github.com/sayanarijit/qrcode.show>
+- **Project Maintainer**: <https://arijitbasu.in>
 
-- Nolan Rumble - https://nolanrumble.com - $5
+### COPYRIGHT
 
-> Top 5 sponsors get mentioned here (updated monthly) Visit https://opencollective.com/qrcodeshow
-
-### 📋 CREDITS:
-
-- Main Library https://github.com/kennytm/qrcode-rust
-- Cloudflare Worker https://github.com/cloudflare/workers-rs
-- Alternate Web Server https://github.com/tokio-rs/axum
-
-> Only the direct dependencies for the main business logic are listed here. Please contact the project maintainer if you are missing from the list.
-
-### 🔗 RELATED LINKS:
-
-- Project Repository https://github.com/sayanarijit/qrcode.show
-- Project Maintainer https://arijitbasu.in
-
-### 📓 COPYRIGHT:
-
-**© Arijit Basu 2021**
+© Arijit Basu 2026

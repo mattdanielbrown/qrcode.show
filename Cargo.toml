@@ -1,6 +1,3 @@
 [workspace]
-members = [
-    "libs",
-    "axum-server",
-    "cf-worker",
-]
+resolver = "3"
+members = ["libs", "axum-server", "cf-worker"]
