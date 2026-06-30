@@ -10,12 +10,12 @@ use axum::{
     routing::get,
 };
 
-use libs::EcLevel;
 use libs::Format;
 use libs::Generator;
 use libs::HELP;
 use libs::HTML_HELP;
 use libs::TEMPLATE;
+use libs::{EcLevel, QrResult};
 
 fn get_first_header_value(
     headers: &header::HeaderMap,
@@ -206,34 +206,48 @@ async fn get_handler(
 ) -> Result<Response, StatusCode> {
     let (_, path) = uri.path().split_once('/').unwrap_or_default();
 
-    if path.is_empty() {
-        match generator.format {
-            Format::Html => {
-                let html = TEMPLATE
-                    .trim()
-                    .replace("{{ content }}", "")
-                    .replace("{{ help }}", &HTML_HELP.trim());
-                Ok(Response::builder()
-                    .status(StatusCode::OK)
-                    .header(header::CONTENT_TYPE, "text/html; charset=utf-8")
-                    .body(Body::from(html))
-                    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
-            }
-            Format::PlainText | Format::Unicode => Ok(Response::builder()
-                .status(StatusCode::OK)
-                .header(header::CONTENT_TYPE, "text/plain; charset=utf-8")
-                .body(Body::from(HELP.trim()))
-                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?),
-            _ => Err(StatusCode::BAD_REQUEST),
-        }
-    } else {
-        let input = uri
-            .query()
-            .map(|q| format!("{}?{}", path, q))
-            .unwrap_or_else(|| path.to_string());
+    let input = uri
+        .query()
+        .map(|q| format!("{}?{}", path, q))
+        .unwrap_or_else(|| path.to_string());
 
-        let bytes = input.as_bytes();
-        generate(bytes, &generator)
+    let bytes = input.as_bytes();
+
+    let output = if bytes.is_empty() {
+        QrResult::Ok(vec![])
+    } else {
+        generator.generate(bytes)
+    };
+
+    match (generator.format, output) {
+        (Format::Html, Ok(qr)) => {
+            let html = TEMPLATE
+                .trim()
+                .replace("{{ content }}", &String::from_utf8_lossy(&qr))
+                .replace("{{ help }}", &HTML_HELP.trim());
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, generator.format.content_type())
+                .body(Body::from(html))
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
+        }
+        (Format::PlainText | Format::Unicode, Ok(qr)) if qr.is_empty() => {
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, generator.format.content_type())
+                .body(Body::from(format!("{}\n", HELP.trim())))
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
+        }
+
+        (_, Ok(qr)) => {
+            let content_type = generator.format.content_type();
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, content_type)
+                .body(Body::from(qr))
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
+        }
+        (_, _) => Err(StatusCode::BAD_REQUEST),
     }
 }
 
