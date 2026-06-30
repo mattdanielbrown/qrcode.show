@@ -1,3 +1,5 @@
+[![QRcode.show demo](./demo/demo.gif)](https://qrcode.show)
+
 ### NAME
 
 **QRcode.show** - Generate QR code easily for free - QR Code Generation as
