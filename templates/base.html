@@ -153,6 +153,16 @@
           0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
         --transition-speed: 0.2s;
+
+        /* Code syntax highlighting - Light Mode */
+        --code-keyword: #d90429;
+        --code-string: #2b9348;
+        --code-command: #023e8a;
+        --code-attribute: #0096c7;
+        --code-variable: #f77f00;
+        --code-operator: #0f172a;
+        --code-builtin: #7209b7;
+        --code-function: #b7094c;
       }
 
       :root.dark {
@@ -167,6 +177,16 @@
         --button-text: #0f172a;
         --pre-bg: #1e293b;
         --pre-text: #f8fafc;
+
+        /* Code syntax highlighting - Dark Mode */
+        --code-keyword: #ff6b6b;
+        --code-string: #69db7c;
+        --code-command: #4dadf7;
+        --code-attribute: #66d9e8;
+        --code-variable: #ffd43b;
+        --code-operator: #f8fafc;
+        --code-builtin: #da77f2;
+        --code-function: #ff8787;
       }
 
       * {
@@ -525,6 +545,19 @@
         padding: 0;
         border-radius: 0;
       }
+
+      /* Code syntax highlighting classes */
+      .help-content pre.sourceCode code .ex { color: var(--code-command); }
+      .help-content pre.sourceCode code .at { color: var(--code-attribute); }
+      .help-content pre.sourceCode code .bu { color: var(--code-builtin); }
+      .help-content pre.sourceCode code .kw { color: var(--code-keyword); font-weight: 500; }
+      .help-content pre.sourceCode code .va { color: var(--code-variable); }
+      .help-content pre.sourceCode code .op { color: var(--code-operator); }
+      .help-content pre.sourceCode code .st { color: var(--code-string); }
+      .help-content pre.sourceCode code .fu { color: var(--code-function); font-weight: 500; }
+      .help-content pre.sourceCode code .dt { color: var(--code-operator); }
+      .help-content pre.sourceCode code .ot { color: var(--code-attribute); }
+      .help-content pre.sourceCode code .co { color: var(--text-muted); font-style: italic; }
 
       .help-content table {
         width: 100%;
@@ -1393,7 +1426,6 @@
         // Sync Color pickers and text inputs
         $("#fg-color").on("input", function () {
           $("#fg-color-hex").val($(this).val().toUpperCase());
-          triggerGeneration();
         });
 
         $("#fg-color-hex").on("input", function () {
@@ -1401,14 +1433,12 @@
           if (!val.startsWith("#") && val.length > 0) val = "#" + val;
           if (/^#[0-9A-F]{6}$/i.test(val)) {
             $("#fg-color").val(val);
-            triggerGeneration();
           }
         });
 
         $("#bg-color").on("input", function () {
           $("#bg-color-hex").val($(this).val().toUpperCase());
           $("#qr").css("background-color", $(this).val());
-          triggerGeneration();
         });
 
         $("#bg-color-hex").on("input", function () {
@@ -1417,28 +1447,8 @@
           if (/^#[0-9A-F]{6}$/i.test(val)) {
             $("#bg-color").val(val);
             $("#qr").css("background-color", val);
-            triggerGeneration();
           }
         });
-
-        // Trigger updates on settings change
-        $("#ec-level, #quiet-zone").on("change", function () {
-          triggerGeneration();
-        });
-
-        // Auto-generate as user types
-        $("#data").on("input", function () {
-          triggerGeneration();
-        });
-
-        // Debounce mechanism
-        let updateTimeout;
-        function triggerGeneration() {
-          if ($("#qr svg").length > 0 || $("#data").val().trim() !== "") {
-            clearTimeout(updateTimeout);
-            updateTimeout = setTimeout(generateQRCode, 250);
-          }
-        }
 
         // Generate QR code AJAX function
         function generateQRCode() {
@@ -1484,7 +1494,6 @@
         // Submit button click
         $("#submit").on("click", function (event) {
           event.preventDefault();
-          clearTimeout(updateTimeout);
 
           $("#qr").html(
             '<div class="qr-loader"><div class="spinner"></div><p>Generating...</p></div>'
@@ -1593,7 +1602,14 @@
           image.src = blobURL;
         }
 
-        if ($("#qr").html().trim() !== "") {
+        // On page load, generate if there is data in the input and no QR is already rendered
+        if ($("#data").val().trim() !== "") {
+          if ($("#qr svg").length === 0) {
+            generateQRCode();
+          } else {
+            $("#qrcontrols").show();
+          }
+        } else if ($("#qr").html().trim() !== "") {
           $("#qrcontrols").show();
         }
       });
