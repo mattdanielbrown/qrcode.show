@@ -61,7 +61,7 @@
   </thead>
   <tbody>
     <tr>
-      <td>Accept</td>
+      <td>accept</td>
       <td>output type</td>
       <td>
         <code>application/octet-stream</code>, <code>text/plain</code>,
@@ -70,52 +70,52 @@
       </td>
     </tr>
     <tr>
-      <td>X-QR-Width</td>
+      <td>x-qr-width</td>
       <td>default width</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Height</td>
+      <td>x-qr-height</td>
       <td>default height</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Min-Width</td>
+      <td>x-qr-min-width</td>
       <td>minimum width</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Min-Height</td>
+      <td>x-qr-min-height</td>
       <td>minimum height</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Max-Width</td>
+      <td>x-qr-max-width</td>
       <td>maximum width</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Max-Height</td>
+      <td>x-qr-max-height</td>
       <td>maximum height</td>
       <td></td>
     </tr>
     <tr>
-      <td>X-QR-Dark-Color</td>
+      <td>x-qr-dark-color</td>
       <td>dark color (hex)</td>
       <td>rrggbb</td>
     </tr>
     <tr>
-      <td>X-QR-Light-Color</td>
+      <td>x-qr-light-color</td>
       <td>light color (hex)</td>
       <td>rrggbb</td>
     </tr>
     <tr>
-      <td>X-QR-Version-Type</td>
+      <td>x-qr-version-type</td>
       <td>QR version type</td>
       <td><code>normal</code>, <code>micro</code></td>
     </tr>
     <tr>
-      <td>X-QR-Version-Number</td>
+      <td>x-qr-version-number</td>
       <td>QR version number</td>
       <td>
         <code>1</code> -&gt; <code>40</code> for normal, <code>1</code> -&gt;
@@ -123,12 +123,12 @@
       </td>
     </tr>
     <tr>
-      <td>X-QR-EC-Level</td>
+      <td>x-qr-ec-level</td>
       <td>error checking level</td>
       <td><code>L</code>, <code>M</code>, <code>Q</code>, <code>H</code></td>
     </tr>
     <tr>
-      <td>X-QR-Quiet-Zone</td>
+      <td>x-qr-quiet-zone</td>
       <td>add quiet zone</td>
       <td><code>true</code>/ <code>false</code></td>
     </tr>
@@ -138,7 +138,7 @@
 <div class="sourceCode" id="cb9">
   <pre
     class="sourceCode bash"
-  ><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> qrcode.show/INPUT <span class="at">-H</span> <span class="st">&quot;Accept: image/svg+xml&quot;</span></span></code></pre>
+  ><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> qrcode.show/INPUT <span class="at">-H</span> accept:image/svg+xml</span></code></pre>
 </div>
 <h3 id="shell-functions">SHELL FUNCTIONS</h3>
 <p>
@@ -158,7 +158,7 @@
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">qrsvg ()</span> <span class="kw">{</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="va">input</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$*</span><span class="st">&quot;</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$input</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">local</span> <span class="va">input</span><span class="op">=</span><span class="st">&quot;@/dev/stdin&quot;</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">curl</span> <span class="at">-d</span> <span class="st">&quot;</span><span class="va">${input}</span><span class="st">&quot;</span> https://qrcode.show <span class="at">-H</span> <span class="st">&quot;Accept: image/svg+xml&quot;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">curl</span> <span class="at">-d</span> <span class="st">&quot;</span><span class="va">${input}</span><span class="st">&quot;</span> https://qrcode.show <span class="at">-H</span> accept:image/svg+xml</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">qrserve ()</span> <span class="kw">{</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="va">port</span><span class="op">=</span><span class="va">${1</span><span class="op">:-</span>8080<span class="va">}</span></span>
@@ -173,7 +173,7 @@
   <li>No data collection or retention.</li>
   <li>Fast and simple API that works on both web and terminal.</li>
   <li>Supports GET and POST requests.</li>
-  <li>Supports <code>Accept</code> header to control the output format.</li>
+  <li>Supports <code>accept</code> header to control the output format.</li>
 </ul>
 <h3 id="credits">CREDITS</h3>
 <ul>

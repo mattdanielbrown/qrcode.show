@@ -25,37 +25,37 @@ QRcode.show(1)                        General Commands Manual                   
        Header             Descrip‐     Format / Options
                           tion
        ───────────────────────────────────────────────────────────────────────────────────
-       Accept             output       application/octet-stream,  text/plain,  text/html,
+       accept             output       application/octet-stream,  text/plain,  text/html,
                           type         image/svg+xml, image/png, image/jpeg
-       X-QR-Width         default
+       x-qr-width         default
                           width
-       X-QR-Height        default
+       x-qr-height        default
                           height
-       X-QR-Min-Width     minimum
+       x-qr-min-width     minimum
                           width
-       X-QR-Min-Height    minimum
+       x-qr-min-height    minimum
                           height
-       X-QR-Max-Width     maximum
+       x-qr-max-width     maximum
                           width
-       X-QR-Max-Height    maximum
+       x-qr-max-height    maximum
                           height
-       X-QR-Dark-Color    dark color   rrggbb
+       x-qr-dark-color    dark color   rrggbb
                           (hex)
-       X-QR-Light-Color   light        rrggbb
+       x-qr-light-color   light        rrggbb
                           color
                           (hex)
-       X-QR-Ver‐          QR version   normal, micro
-       sion-Type          type
-       X-QR-Ver‐          QR version   1 -> 40 for normal, 1 -> 4 for micro.
-       sion-Number        number
-       X-QR-EC-Level      error        L, M, Q, H
+       x-qr-ver‐          QR version   normal, micro
+       sion-type          type
+       x-qr-ver‐          QR version   1 -> 40 for normal, 1 -> 4 for micro.
+       sion-number        number
+       x-qr-ec-level      error        L, M, Q, H
                           checking
                           level
-       X-QR-Quiet-Zone    add  quiet   true/ false
+       x-qr-quiet-zone    add  quiet   true/ false
                           zone
 
    PARAMETER EXAMPLES
-              curl qrcode.show/INPUT -H "Accept: image/svg+xml"
+              curl qrcode.show/INPUT -H accept:image/svg+xml
 
    SHELL FUNCTIONS
        Shell  functions  that  can  be  added to .bashrc or .bash_profle for quickly generating QR
@@ -70,7 +70,7 @@ QRcode.show(1)                        General Commands Manual                   
               qrsvg () {
                   local input="$*"
                   [ -z "$input" ] && local input="@/dev/stdin"
-                  curl -d "${input}" https://qrcode.show -H "Accept: image/svg+xml"
+                  curl -d "${input}" https://qrcode.show -H accept:image/svg+xml
               }
               qrserve () {
                   local port=${1:-8080}
@@ -87,7 +87,7 @@ QRcode.show(1)                        General Commands Manual                   
 
        • Supports GET and POST requests.
 
-       • Supports Accept header to control the output format.
+       • Supports accept header to control the output format.
 
    CREDITS
        • Main Library: ⟨https://github.com/kennytm/qrcode-rust⟩

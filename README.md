@@ -45,24 +45,24 @@ echo https://example.com | curl qrcode.show -d @-
 
 | Header              | Description          | Format / Options                                                                                  |
 | ------------------- | -------------------- | ------------------------------------------------------------------------------------------------- |
-| Accept              | output type          | `application/octet-stream`, `text/plain`, `text/html`, `image/svg+xml`, `image/png`, `image/jpeg` |
-| X-QR-Width          | default width        |
-| X-QR-Height         | default height       |
-| X-QR-Min-Width      | minimum width        |
-| X-QR-Min-Height     | minimum height       |
-| X-QR-Max-Width      | maximum width        |
-| X-QR-Max-Height     | maximum height       |
-| X-QR-Dark-Color     | dark color (hex)     | rrggbb                                                                                            |
-| X-QR-Light-Color    | light color (hex)    | rrggbb                                                                                            |
-| X-QR-Version-Type   | QR version type      | `normal`, `micro`                                                                                 |
-| X-QR-Version-Number | QR version number    | `1` -> `40` for normal, `1` -> `4` for micro.                                                     |
-| X-QR-EC-Level       | error checking level | `L`, `M`, `Q`, `H`                                                                                |
-| X-QR-Quiet-Zone     | add quiet zone       | `true`/ `false`                                                                                   |
+| accept              | output type          | `application/octet-stream`, `text/plain`, `text/html`, `image/svg+xml`, `image/png`, `image/jpeg` |
+| x-qr-width          | default width        |                                                                                                   |
+| x-qr-height         | default height       |                                                                                                   |
+| x-qr-min-width      | minimum width        |                                                                                                   |
+| x-qr-min-height     | minimum height       |                                                                                                   |
+| x-qr-max-width      | maximum width        |                                                                                                   |
+| x-qr-max-height     | maximum height       |                                                                                                   |
+| x-qr-dark-color     | dark color (hex)     | rrggbb                                                                                            |
+| x-qr-light-color    | light color (hex)    | rrggbb                                                                                            |
+| x-qr-version-type   | QR version type      | `normal`, `micro`                                                                                 |
+| x-qr-version-number | QR version number    | `1` -> `40` for normal, `1` -> `4` for micro.                                                     |
+| x-qr-ec-level       | error checking level | `L`, `M`, `Q`, `H`                                                                                |
+| x-qr-quiet-zone     | add quiet zone       | `true`/ `false`                                                                                   |
 
 ### PARAMETER EXAMPLES
 
 ```bash
-curl qrcode.show/INPUT -H "Accept: image/svg+xml"
+curl qrcode.show/INPUT -H accept:image/svg+xml
 ```
 
 ### SHELL FUNCTIONS
@@ -81,7 +81,7 @@ qrcode () {
 qrsvg () {
     local input="$*"
     [ -z "$input" ] && local input="@/dev/stdin"
-    curl -d "${input}" https://qrcode.show -H "Accept: image/svg+xml"
+    curl -d "${input}" https://qrcode.show -H accept:image/svg+xml
 }
 qrserve () {
     local port=${1:-8080}
@@ -97,7 +97,7 @@ qrserve () {
 - No data collection or retention.
 - Fast and simple API that works on both web and terminal.
 - Supports GET and POST requests.
-- Supports `Accept` header to control the output format.
+- Supports `accept` header to control the output format.
 
 ### CREDITS
 

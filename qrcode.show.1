@@ -53,7 +53,7 @@ Format / Options
 T}
 _
 T{
-Accept
+accept
 T}@T{
 output type
 T}@T{
@@ -62,64 +62,64 @@ T}@T{
 \f[CR]image/jpeg\f[R]
 T}
 T{
-X\-QR\-Width
+x\-qr\-width
 T}@T{
 default width
 T}@T{
 T}
 T{
-X\-QR\-Height
+x\-qr\-height
 T}@T{
 default height
 T}@T{
 T}
 T{
-X\-QR\-Min\-Width
+x\-qr\-min\-width
 T}@T{
 minimum width
 T}@T{
 T}
 T{
-X\-QR\-Min\-Height
+x\-qr\-min\-height
 T}@T{
 minimum height
 T}@T{
 T}
 T{
-X\-QR\-Max\-Width
+x\-qr\-max\-width
 T}@T{
 maximum width
 T}@T{
 T}
 T{
-X\-QR\-Max\-Height
+x\-qr\-max\-height
 T}@T{
 maximum height
 T}@T{
 T}
 T{
-X\-QR\-Dark\-Color
+x\-qr\-dark\-color
 T}@T{
 dark color (hex)
 T}@T{
 rrggbb
 T}
 T{
-X\-QR\-Light\-Color
+x\-qr\-light\-color
 T}@T{
 light color (hex)
 T}@T{
 rrggbb
 T}
 T{
-X\-QR\-Version\-Type
+x\-qr\-version\-type
 T}@T{
 QR version type
 T}@T{
 \f[CR]normal\f[R], \f[CR]micro\f[R]
 T}
 T{
-X\-QR\-Version\-Number
+x\-qr\-version\-number
 T}@T{
 QR version number
 T}@T{
@@ -127,14 +127,14 @@ T}@T{
 for micro.
 T}
 T{
-X\-QR\-EC\-Level
+x\-qr\-ec\-level
 T}@T{
 error checking level
 T}@T{
 \f[CR]L\f[R], \f[CR]M\f[R], \f[CR]Q\f[R], \f[CR]H\f[R]
 T}
 T{
-X\-QR\-Quiet\-Zone
+x\-qr\-quiet\-zone
 T}@T{
 add quiet zone
 T}@T{
@@ -144,7 +144,7 @@ T}
 .SS PARAMETER EXAMPLES
 .IP
 .EX
-curl qrcode.show/INPUT \-H \(dqAccept: image/svg+xml\(dq
+curl qrcode.show/INPUT \-H accept:image/svg+xml
 .EE
 .SS SHELL FUNCTIONS
 Shell functions that can be added to \f[CR].bashrc\f[R] or
@@ -162,7 +162,7 @@ qrcode () \f[B]{\f[R]
 qrsvg () \f[B]{\f[R]
     local input=\(dq$*\(dq
     [ \-z \(dq$input\(dq ] \f[B]&&\f[R] local input=\(dq\(at/dev/stdin\(dq
-    curl \-d \(dq${input}\(dq https://qrcode.show \-H \(dqAccept: image/svg+xml\(dq
+    curl \-d \(dq${input}\(dq https://qrcode.show \-H accept:image/svg+xml
 \f[B]}\f[R]
 qrserve () \f[B]{\f[R]
     local port=${1:\-8080}
@@ -180,7 +180,7 @@ Fast and simple API that works on both web and terminal.
 .IP \(bu 2
 Supports GET and POST requests.
 .IP \(bu 2
-Supports \f[CR]Accept\f[R] header to control the output format.
+Supports \f[CR]accept\f[R] header to control the output format.
 .SS CREDITS
 .IP \(bu 2
 \f[B]Main Library\f[R]: \c
